@@ -1,5 +1,7 @@
 # NkLIB: Nekso's common Erlang library functions
 
+[![Build Status](https://travis-ci.org/yurrriq/nklib.svg?branch=master)](https://travis-ci.org/yurrriq/nklib)
+
 NkLIB includes a series of common utilities and services for NkCORE,
 but probably useful for other applications:
 
