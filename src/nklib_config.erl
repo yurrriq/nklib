@@ -28,7 +28,7 @@
 -export([parse_config/2, parse_config/3, load_env/3, load_domain/5]).
 -export([make_cache/5]).
 
--export([start_link/0, init/1, terminate/2, code_change/3, handle_call/3, handle_cast/2, 
+-export([start_link/0, init/1, terminate/2, code_change/3, handle_call/3, handle_cast/2,
          handle_info/2]).
 -export_type([syntax/0, parse_opts/0]).
 
@@ -45,7 +45,7 @@
     map() | list() | syntax_fun().
 
 -type syntax_fun() ::
-    fun((atom(), term(), fun_ctx()) -> 
+    fun((atom(), term(), fun_ctx()) ->
         ok | {ok, term()} | {ok, term(), term()} |
         {new_ok, [{atom(), term()}]} | error | {error, term()}).
 
@@ -53,7 +53,7 @@
     parse_opts() | #{ok=>[{atom(), term()}], no_ok=>[{binary(), term()}]}.
 
 -type syntax_opt() ::
-    syntax_subopt() | {list|slist|ulist, syntax_subopt()} | 
+    syntax_subopt() | {list|slist|ulist, syntax_subopt()} |
     {update, map|list, MapOrList::atom(), Key::atom(), syntax_subopt()}.
 
 -type syntax() :: #{ atom() => syntax_opt()}.
@@ -73,7 +73,7 @@
 
 
 %% @doc Equivalent to `get(Key, undefined)'.
--spec get(term(), term()) -> 
+-spec get(term(), term()) ->
     Value :: term().
 
 get(Mod, Key) ->
@@ -81,10 +81,10 @@ get(Mod, Key) ->
 
 
 %% @doc Gets an config value.
--spec get(term(), term(), term()) -> 
+-spec get(term(), term(), term()) ->
     Value :: term().
 
-get(Mod, Key, Default) -> 
+get(Mod, Key, Default) ->
     case ets:lookup(?MODULE, {Mod, none, Key}) of
         [] -> Default;
         [{_, Value}] -> Value
@@ -92,18 +92,18 @@ get(Mod, Key, Default) ->
 
 
 %% @doc Sets a config value.
--spec put(term(), term(), term()) -> 
+-spec put(term(), term(), term()) ->
     ok.
 
-put(Mod, Key, Val) -> 
+put(Mod, Key, Val) ->
     put_domain(Mod, none, Key, Val).
 
 
 %% @doc Deletes a config value.
--spec del(term(), term()) -> 
+-spec del(term(), term()) ->
     ok.
 
-del(Mod, Key) -> 
+del(Mod, Key) ->
     del_domain(Mod, none, Key).
 
 
@@ -116,7 +116,7 @@ increment(Mod, Key, Count) ->
 
 
 %% @private
--spec get_domain(term(), nklib:domain(), term()) -> 
+-spec get_domain(term(), nklib:domain(), term()) ->
     Value :: term().
 
 get_domain(Mod, Domain, Key) ->
@@ -124,7 +124,7 @@ get_domain(Mod, Domain, Key) ->
 
 
 %% @private
--spec get_domain(term(), nklib:domain(), term(), term()) -> 
+-spec get_domain(term(), nklib:domain(), term(), term()) ->
     Value :: term().
 
 get_domain(Mod, Domain, Key, Default) ->
@@ -135,19 +135,19 @@ get_domain(Mod, Domain, Key, Default) ->
 
 
 %% @doc Sets a config value.
--spec put_domain(term(), nklib:domain(), term(), term()) -> 
+-spec put_domain(term(), nklib:domain(), term(), term()) ->
     ok.
 
-put_domain(Mod, Domain, Key, Val) -> 
+put_domain(Mod, Domain, Key, Val) ->
     true = ets:insert(?MODULE, {{Mod, Domain, Key}, Val}),
     ok.
 
 
 %% @doc Deletes a config value.
--spec del_domain(term(), nklib:domain(), term()) -> 
+-spec del_domain(term(), nklib:domain(), term()) ->
     ok.
 
-del_domain(Mod, Domain, Key) -> 
+del_domain(Mod, Domain, Key) ->
     true = ets:delete(?MODULE, {Mod, Domain, Key}),
     ok.
 
@@ -162,11 +162,11 @@ increment_domain(Mod, Domain, Key, Count) ->
 
 %% @doc Equivalent to parse_config(Terms, Spec, #{})
 -spec parse_config(map()|list(), syntax()) ->
-    {ok, [{atom(), term()}], [{binary(), term()}]} | 
+    {ok, [{atom(), term()}], [{binary(), term()}]} |
     {ok, #{atom()=>term()}, #{binary()=>term()}} |
     {error, Error}
-    when Error :: 
-        {syntax_error, binary()} | 
+    when Error ::
+        {syntax_error, binary()} |
         {invalid_spec, syntax_opt()} |
         term().
 
@@ -177,11 +177,11 @@ parse_config(Terms, Spec) ->
 %% @doc Parses a list of options
 %% For lists, if duplicated entries, the last one wins
 -spec parse_config(map()|list(), syntax(), parse_opts()) ->
-    {ok, [{atom(), term()}], [{atom(), term()}]} | 
-    {ok, #{atom()=>term()}, #{binary()=>term()}} | 
+    {ok, [{atom(), term()}], [{atom(), term()}]} |
+    {ok, #{atom()=>term()}, #{binary()=>term()}} |
     {error, Error}
-    when Error :: 
-        {syntax_error, binary()} | 
+    when Error ::
+        {syntax_error, binary()} |
         {invalid_spec, syntax_opt()} |
         term().
 
@@ -217,7 +217,7 @@ load_env(App, Syntax, Defaults) ->
     ok | {error, term()}.
 
 load_domain(Mod, Domain, Opts, Defaults, Syntax) ->
-    do_load_domain(Mod, Domain, nklib_util:to_list(Opts), 
+    do_load_domain(Mod, Domain, nklib_util:to_list(Opts),
                     nklib_util:to_list(Defaults), Syntax).
 
 %% @private
@@ -250,7 +250,7 @@ make_cache(KeyList, Mod, Domain, Module, Path) ->
     Syntax = lists:foldl(
         fun(Key, Acc) ->
             Val = get_domain(Mod, Domain, Key),
-            [nklib_code:getter(Key, Val)|Acc] 
+            [nklib_code:getter(Key, Val)|Acc]
         end,
         [],
         KeyList),
@@ -274,22 +274,22 @@ make_cache(KeyList, Mod, Domain, Module, Path) ->
 %% @private
 start_link() ->
     gen_server:start_link({local, ?MODULE}, ?MODULE, [], []).
-        
 
-%% @private 
+
+%% @private
 -spec init(term()) ->
     {ok, #state{}}.
 
 init([]) ->
     ets:new(?MODULE, [named_table, public, {read_concurrency, true}]),
     {ok, #state{}}.
-    
+
 
 %% @private
 -spec handle_call(term(), {pid(), term()}, #state{}) ->
     {noreply, #state{}}.
 
-handle_call(Msg, _From, State) -> 
+handle_call(Msg, _From, State) ->
     lager:error("Module ~p received unexpected call ~p", [?MODULE, Msg]),
     {noreply, State}.
 
@@ -297,7 +297,7 @@ handle_call(Msg, _From, State) ->
 -spec handle_cast(term(), #state{}) ->
     {noreply, #state{}}.
 
-handle_cast(Msg, State) -> 
+handle_cast(Msg, State) ->
     lager:error("Module ~p received unexpected cast ~p", [?MODULE, Msg]),
     {noreply, State}.
 
@@ -306,7 +306,7 @@ handle_cast(Msg, State) ->
 -spec handle_info(term(), #state{}) ->
     {noreply, #state{}}.
 
-handle_info(Info, State) -> 
+handle_info(Info, State) ->
     lager:warning("Module ~p received unexpected info: ~p", [?MODULE, Info]),
     {noreply, State}.
 
@@ -323,7 +323,7 @@ code_change(_OldVsn, State, _Extra) ->
 -spec terminate(term(), #state{}) ->
     ok.
 
-terminate(_Reason, _State) ->  
+terminate(_Reason, _State) ->
     ok.
 
 
@@ -416,9 +416,9 @@ find_config(Key, Val, Rest, OK, NoOK, Syntax, Opts) ->
             case do_parse_config(SubSyntax, Val) of
                 {ok, Val2} ->
                     NewOK = case lists:keytake(Index2, 1, OK) of
-                        false when UpdType==map -> 
+                        false when UpdType==map ->
                             [{Index2, maps:put(Key2, Val2, #{})}|OK];
-                        false when UpdType==list -> 
+                        false when UpdType==list ->
                             [{Index2, [{Key2, Val2}]}|OK];
                         {value, {Index2, Base}, OKA} when UpdType==map ->
                             [{Index2, maps:put(Key2, Val2, Base)}|OKA];
@@ -511,7 +511,7 @@ do_parse_config({List, Type}, Val) when List==list; List==slist; List==ulist ->
             {ok, []};
         [Head|_] when not is_integer(Head) ->
             do_parse_config_list(List, Val, Type, []);
-        _ -> 
+        _ ->
             do_parse_config_list(List, [Val], Type, [])
     end;
 
@@ -538,9 +538,9 @@ do_parse_config(nat_integer, Val) ->
 
 do_parse_config({integer, Min, Max}, Val) ->
     case nklib_util:to_integer(Val) of
-        error -> 
+        error ->
             error;
-        Int when 
+        Int when
             (Min==none orelse Int >= Min) andalso
             (Max==none orelse Int =< Max) ->
             {ok, Int};
@@ -550,7 +550,7 @@ do_parse_config({integer, Min, Max}, Val) ->
 
 do_parse_config({integer, List}, Val) when is_list(List) ->
     case nklib_util:to_integer(Val) of
-        error -> 
+        error ->
             error;
         Int ->
             case lists:member(Int, List) of
@@ -558,7 +558,7 @@ do_parse_config({integer, List}, Val) when is_list(List) ->
                 false -> error
         end
     end;
-    
+
 do_parse_config({record, Type}, Val) ->
     case is_record(Val, Type) of
         true -> {ok, Val};
@@ -566,7 +566,7 @@ do_parse_config({record, Type}, Val) ->
     end;
 
 do_parse_config(string, Val) ->
-    if 
+    if
         is_list(Val) ->
             case catch erlang:list_to_binary(Val) of
                 {'EXIT', _} -> error;
@@ -594,7 +594,7 @@ do_parse_config(binary, Val) ->
         true ->
             error
     end;
- 
+
 do_parse_config(lower, Val) ->
     case do_parse_config(string, Val) of
         {ok, List} -> {ok, nklib_util:to_lower(List)};
@@ -618,10 +618,10 @@ do_parse_config(host, Val) ->
 
 do_parse_config(host6, Val) ->
     case nklib_util:to_ip(Val) of
-        {ok, HostIp6} -> 
+        {ok, HostIp6} ->
             % Ensure it is enclosed in `[]'
             {ok, nklib_util:to_host(HostIp6, true)};
-        error -> 
+        error ->
             {ok, nklib_util:to_binary(Val)}
     end;
 
@@ -667,7 +667,7 @@ do_parse_config(words, Val) ->
         Tokens -> {ok, [W || {W, _} <- Tokens]}
     end;
 
-do_parse_config(log_level, Val) when Val>=0, Val=<8 -> 
+do_parse_config(log_level, Val) when Val>=0, Val=<8 ->
     {ok, Val};
 
 do_parse_config(log_level, Val) ->
@@ -719,7 +719,7 @@ do_parse_config_list(_, _, _, _) ->
     error.
 
 
-       
+
 
 %% ===================================================================
 %% EUnit tests
@@ -733,7 +733,7 @@ do_parse_config_list(_, _, _, _) ->
 
 
 basic_test_() ->
-    {setup, 
+    {setup,
         fun() -> catch init([]) end,
         fun(_) ->  ok end,
         [
@@ -779,7 +779,7 @@ parse1() ->
         field09 => host6,
         field10 => fun parse_fun/3,
         field11 => [{enum, [a]}, binary],
-        field12 => 
+        field12 =>
             #{
                 field12_a => atom,
                 field12_b => integer
@@ -794,8 +794,8 @@ parse1() ->
     {ok, [], []} = parse_config(#{}, Spec),
 
     {error, {syntax_error, <<"field01">>}} = parse_config([{field01, "12345"}], Spec),
-    
-    {ok,[{field01, fieldXX}, {field02, false}],[{unknown, a}]} = 
+
+    {ok,[{field01, fieldXX}, {field02, false}],[{unknown, a}]} =
         parse_config(
             [{field01, "fieldXX"}, {field02, <<"false">>}, {"unknown", a}],
             Spec),
@@ -808,14 +808,14 @@ parse1() ->
         {field07, <<"b">>},
         {field08, <<"host">>},
         {field09, <<"[::1]">>}
-    ], []} = 
+    ], []} =
         parse_config(
-            [{field03, <<"b">>}, {"field04", -1}, {field05, 2}, {field06, "a"}, 
+            [{field03, <<"b">>}, {"field04", -1}, {field05, 2}, {field06, "a"},
             {field07, "b"}, {<<"field08">>, "host"}, {field09, <<"::1">>}],
             Spec),
 
     {error, {syntax_error, <<"field03">>}} = parse_config([{field03, c}], Spec),
-    {error, {syntax_error, <<"mypath.field05">>}} = 
+    {error, {syntax_error, <<"mypath.field05">>}} =
         parse_config([{field05, 0}], Spec, #{path=><<"mypath">>}),
     {error, {syntax_error, <<"field05">>}} = parse_config([{field05, 6}], Spec),
     {error, {invalid_spec, invalid}} = parse_config([{fieldXX, a}], Spec),
@@ -827,35 +827,35 @@ parse1() ->
     {ok, [{field11, <<"b">>}], []} = parse_config([{field11, b}], Spec),
 
     {error, {syntax_error, <<"field12">>}} = parse_config([{field12, a}], Spec),
-    {error, {syntax_error, <<"field12.field12_a">>}} = 
+    {error, {syntax_error, <<"field12.field12_a">>}} =
         parse_config([{field12, [{field12_a, 1}]}], Spec),
-    {error, {syntax_error, <<"mypath.field12.field12_a">>}} = 
+    {error, {syntax_error, <<"mypath.field12.field12_a">>}} =
         parse_config([{field12, [{field12_a, 1}]}], Spec, #{path=><<"mypath">>}),
 
     % Field 12c is ignored
-    {ok, [{field12, [{field12_a, ok},{field12_b, 1}]}],[]} = Sub1 = 
+    {ok, [{field12, [{field12_a, ok},{field12_b, 1}]}],[]} = Sub1 =
         parse_config(
-            [{field12, [{field12_a, "ok"}, {field12_b, "1"}, {field_12_c, none}]}], 
+            [{field12, [{field12_a, "ok"}, {field12_b, "1"}, {field_12_c, none}]}],
             Spec),
-    Sub1 = 
+    Sub1 =
         parse_config(
             #{field12 => #{field12_a=>"ok", field12_b=>"1", field_12_c=>none}},
             Spec),
-    {ok, #{field12 := #{field12_a:=ok, field12_b:=1}}, #{}} = Sub2 = 
+    {ok, #{field12 := #{field12_a:=ok, field12_b:=1}}, #{}} = Sub2 =
         parse_config(
-            [{field12, [{field12_a, "ok"}, {field12_b, "1"}, {field_12_c, none}]}], 
+            [{field12, [{field12_a, "ok"}, {field12_b, "1"}, {field_12_c, none}]}],
             Spec, #{return=>map}),
-    Sub2 = 
+    Sub2 =
         parse_config(
             #{field12 => #{field12_a=>"ok", field12_b=>"1", field_12_c=>none}},
             Spec, #{return=>map}),
 
     {ok, [{field13, [a, b, '3']}], []} = parse_config(#{field13 => [a, "b", 3]}, Spec),
 
-    {ok, [{field01, a}, {map1, #{m_field14:=1, m_field15:=b}}],[]} = 
+    {ok, [{field01, a}, {map1, #{m_field14:=1, m_field15:=b}}],[]} =
         parse_config(#{field01=>a, field14=>1, field15=>b}, Spec),
 
-    {ok, #{field01:=a, map1:=#{m_field14:=1, m_field15:=b}}, #{}} = 
+    {ok, #{field01:=a, map1:=#{m_field14:=1, m_field15:=b}}, #{}} =
         parse_config([{field01, a}, {field14, 1}, {field15, b}], Spec, #{return=>map}),
 
     {error, {syntax_error, <<"field14">>}} = parse_config(#{field01=>a, field14=>a}, Spec),
@@ -869,13 +869,3 @@ parse_fun(field10, opts, #{ok:=OK}) ->
 
 
 -endif.
-
-
-
-
-
-
-
-
-
-
