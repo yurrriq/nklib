@@ -638,10 +638,12 @@ do_parse_config(unquote, Val) when is_list(Val); is_binary(Val) ->
     end;
 
 do_parse_config(path, Val) when is_list(Val); is_binary(Val) ->
-    case nklib_parse:path(Val) of
-        error -> error;
-        Bin -> {ok, Bin}
-    end;
+    nklib_parse:path(Val);
+%% N.B. The pattern 'error' can never match the type binary().
+%% case nklib_parse:path(Val) of
+%%     error -> error;
+%%     Bin -> {ok, Bin}
+%% end;
 
 do_parse_config(uri, Val) ->
     case nklib_parse:uris(Val) of
