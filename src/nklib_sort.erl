@@ -65,7 +65,7 @@ topsort_insert([], _Digraph) ->
 topsort_insert([{Name, Deps}|Rest], Digraph) ->
     digraph:add_vertex(Digraph, Name),
     lists:foreach(
-        fun(Dep) -> 
+        fun(Dep) ->
             case Dep of
                 Name ->
                     ok;
@@ -106,16 +106,16 @@ top_sort_get_circular([Vertice|Rest], Digraph) ->
 
 
 ok_test() ->
-    {ok, 
+    {ok,
         [std,synopsys,ieee,dware,dw02,dw05,gtech,dw01,dw03,dw04,ramlib,
-         std_cell_lib,des_system_lib,dw06,dw07]} = 
-        sort(lib1()).
+         std_cell_lib,des_system_lib,dw06,dw07]} =
+        top_sort(lib1()).
 
 fail_test() ->
-    {error, {circular_dependencies,[dw01,dw04]}} = sort(lib2()).
+    {error, {circular_dependencies,[dw01,dw04]}} = top_sort(lib2()).
 
 
-lib1() -> 
+lib1() ->
         [{des_system_lib,   [std, synopsys, std_cell_lib, des_system_lib, dw02, dw01, ramlib, ieee]},
          {dw01,             [ieee, dw01, dware, gtech]},
          {dw02,             [ieee, dw02, dware]},
@@ -129,7 +129,7 @@ lib1() ->
          {ramlib,           [std, ieee]},
          {std_cell_lib,     [ieee, std_cell_lib]},
          {synopsys,         []}].
- 
+
 lib2() ->
         [{des_system_lib,   [std, synopsys, std_cell_lib, des_system_lib, dw02, dw01, ramlib, ieee]},
          {dw01,             [ieee, dw01, dw04, dware, gtech]},
@@ -144,5 +144,5 @@ lib2() ->
          {ramlib,           [std, ieee]},
          {std_cell_lib,     [ieee, std_cell_lib]},
          {synopsys,         []}].
- 
- -endif.
+
+-endif.
